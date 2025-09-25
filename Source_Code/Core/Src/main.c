@@ -51,11 +51,33 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-
+void Display7SEG(int number);
+void Clear7SEG();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Display7SEG(int number){
+	Clear7SEG();
+
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 0, !(segment_code[0] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 1, !(segment_code[1] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 2, !(segment_code[2] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 3, !(segment_code[3] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 4, !(segment_code[4] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 5, !(segment_code[5] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, !(segment_code[6] & number_code[number]));
+}
+
+void Clear7SEG(){
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 0, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 1, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 2, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 3, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 4, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 5, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, SET);
+}
 
 /* USER CODE END 0 */
 
@@ -222,12 +244,33 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-int counter = 100;
+int led_counter = 100;
+int seg_counter = 50;
+int seg_state = 0;
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
-	--counter;
-	if(counter <= 0){
-		counter = 100;
+	--led_counter;
+	if(led_counter <= 0){
+		led_counter = 100;
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+	}
+
+	--seg_counter;
+	if(seg_counter <= 0){
+		seg_counter = 50;
+		switch(seg_state){
+		case 0:
+			Display7SEG(1);
+			seg_state = 1;
+			break;
+
+		case 1:
+			Display7SEG(2);
+			seg_state = 0;
+			break;
+
+		default:
+			break;
+		}
 	}
 }
 /* USER CODE END 4 */
