@@ -1,0 +1,4 @@
+Software_Timer.c:17:6:SoftwareTimer_Init	24	static
+Software_Timer.c:23:5:SoftwareTimer_AddNewTimer	40	static
+Software_Timer.c:35:6:SoftwareTimer_SetTimer	16	static
+Software_Timer.c:39:11:SoftwareTimer_GetFlag	16	static

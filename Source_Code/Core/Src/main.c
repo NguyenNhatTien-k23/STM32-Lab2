@@ -22,7 +22,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "Software_Timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -51,8 +51,7 @@ TIM_HandleTypeDef htim2;
 const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a->g
 const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
 
-//int segment_state = SEG_ALL_ON;
-int seg_number = 0;
+int seg_state = SEG_EN0;
 
 /* USER CODE END PV */
 
@@ -63,6 +62,10 @@ static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void Display7SEG(int number);
 void Clear7SEG();
+
+void WriteEnState7SEG(int number);
+void ClearEnState7SEG();
+void FillEnState7SEG();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -87,6 +90,24 @@ void Clear7SEG(){
 	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 4, SET);
 	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 5, SET);
 	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, SET);
+}
+
+void WriteEnState7SEG(int number){
+	ClearEnState7SEG();
+	if(number >= 0){
+		HAL_GPIO_WritePin(GPIOA, EN0_Pin << number, RESET);
+	}
+}
+
+void ClearEnState7SEG(){
+	//This will be updated as more 7-segment display is included
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 0, SET);
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 1, SET);
+}
+
+void FillEnState7SEG(){
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 0, RESET);
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 1, RESET);
 }
 /* USER CODE END 0 */
 
@@ -120,10 +141,10 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-//  HAL_TIM_Base_Start_IT(&htim2);
+  HAL_TIM_Base_Start_IT(&htim2);
 
-  HAL_GPIO_WritePin(GPIOA, EN0_Pin, RESET);
-  HAL_GPIO_WritePin(GPIOA, EN1_Pin, RESET);
+  WriteEnState7SEG(seg_state);
+  Display7SEG(1);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -133,11 +154,13 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  Display7SEG(seg_number++);
-	  if(seg_number >= 10){
-		  seg_number = 0;
-	  }
-	  HAL_Delay(1000);
+	if(seg_state == SEG_EN0){
+		Display7SEG(1);
+	}
+
+	if(seg_state == SEG_EN1){
+		Display7SEG(2);
+	}
   }
   /* USER CODE END 3 */
 }
@@ -262,13 +285,8 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 int counter = 100;
+//10ms
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
-	--counter;
-	if(counter <= 0){
-		counter = 100;
-		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-	}
-
 
 }
 /* USER CODE END 4 */
