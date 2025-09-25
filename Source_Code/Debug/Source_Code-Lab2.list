@@ -725,15 +725,15 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
  8000526:	d002      	beq.n	800052e <HAL_TIM_PeriodElapsedCallback+0x4e>
  8000528:	2b01      	cmp	r3, #1
  800052a:	d007      	beq.n	800053c <HAL_TIM_PeriodElapsedCallback+0x5c>
-			Display7SEG(2);
+			Display7SEG(1);
 			seg_state = 0;
 			break;
 
 		default:
 			break;
  800052c:	e00d      	b.n	800054a <HAL_TIM_PeriodElapsedCallback+0x6a>
-			Display7SEG(1);
- 800052e:	2001      	movs	r0, #1
+			Display7SEG(2);
+ 800052e:	2002      	movs	r0, #2
  8000530:	f7ff fe0c 	bl	800014c <Display7SEG>
 			seg_state = 1;
  8000534:	4b0c      	ldr	r3, [pc, #48]	; (8000568 <HAL_TIM_PeriodElapsedCallback+0x88>)
@@ -741,8 +741,8 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
  8000538:	601a      	str	r2, [r3, #0]
 			break;
  800053a:	e006      	b.n	800054a <HAL_TIM_PeriodElapsedCallback+0x6a>
-			Display7SEG(2);
- 800053c:	2002      	movs	r0, #2
+			Display7SEG(1);
+ 800053c:	2001      	movs	r0, #1
  800053e:	f7ff fe05 	bl	800014c <Display7SEG>
 			seg_state = 0;
  8000542:	4b09      	ldr	r3, [pc, #36]	; (8000568 <HAL_TIM_PeriodElapsedCallback+0x88>)

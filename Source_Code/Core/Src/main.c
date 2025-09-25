@@ -283,13 +283,13 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
 	if(seg_counter <= 0){
 		seg_counter = 50;
 		switch(seg_state){
-		case 0:
-			Display7SEG(1);
+		case 0:		//1->2
+			Display7SEG(2);
 			seg_state = 1;
 			break;
 
-		case 1:
-			Display7SEG(2);
+		case 1:		//2->1
+			Display7SEG(1);
 			seg_state = 0;
 			break;
 
