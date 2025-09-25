@@ -11,16 +11,24 @@ TimerNode_t* head;
 TimerNode_t* timers[16] = {};
 int timer_count = 0;
 
-//Initialize Dummy Node
+/**
+ * Initialize Dummy Node
+ * Must be called before enter infinite loop
+ * Must be called before using any other function
+ */
 void SoftwareTimer_Init(){
 	head = (TimerNode_t*)malloc(sizeof(TimerNode_t));
 	head->next = NULL;
 	head->timer = (Timer_t){0, 0, FLAG_OFF};
 }
 
+/**
+ * Must only be called when new timer is needed
+ * Should only be used outside of infinite loop
+ */
 int SoftwareTimer_AddNewTimer(int time_amount){
 	//Step 1: Create a new timer
-	Timer_t new_timer = {time_amount, time_amount, FLAG_OFF};
+	Timer_t new_timer = {timer_count, time_amount, time_amount, FLAG_OFF};
 
 	//Step 2: Create a new timer_node
 	TimerNode_t* new_node = (TimerNode_t*)malloc(sizeof(TimerNode_t));
@@ -49,5 +57,14 @@ void SoftwareTimer_ResetFlag(int id){
 }
 
 void SoftwareTimer_Step(){
+	TimerNode_t* node = head->next;
+	if(node->timer.counter > 0){
+		node->timer.counter--;
+	}
 
+	if(node->timer.counter <= 0){
+		int id = node->timer.id;
+		timers[id]->timer.flag = FLAG_ON;
+		LinkedList_PopHead(head);
+	}
 }

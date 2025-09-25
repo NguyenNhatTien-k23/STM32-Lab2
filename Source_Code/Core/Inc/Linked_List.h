@@ -17,7 +17,7 @@ typedef struct TimerNode TimerNode_t;
 
 /*Public Member Function*/
 void LinkedList_Add(TimerNode_t* head, TimerNode_t* new_node);
-
+void LinkedList_PopHead(TimerNode_t* head);
 
 /*Private Member Function*/
 
@@ -25,6 +25,7 @@ void LinkedList_Add(TimerNode_t* head, TimerNode_t* new_node);
 
 /*Struct definition*/
 struct Timer{
+	int id;
 	int base_counter;
 	int counter;
 	int flag;

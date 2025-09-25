@@ -52,6 +52,8 @@ const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a-
 const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
 
 int seg_state = SEG_EN0;
+int seg_timer_id = -1;
+int led_timer_id = -1;
 
 /* USER CODE END PV */
 
@@ -141,7 +143,12 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
+  SoftwareTimer_Init();
+
   HAL_TIM_Base_Start_IT(&htim2);
+
+  led_timer_id = SoftwareTimer_AddNewTimer(100);
+  seg_timer_id = SoftwareTimer_AddNewTimer(50);
 
   WriteEnState7SEG(seg_state);
   Display7SEG(1);
@@ -154,12 +161,28 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	if(seg_state == SEG_EN0){
-		Display7SEG(1);
+	if(SoftwareTimer_GetFlag(led_timer_id) == FLAG_ON){
+		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		SoftwareTimer_ResetFlag(led_timer_id);
 	}
 
-	if(seg_state == SEG_EN1){
-		Display7SEG(2);
+	if(SoftwareTimer_GetFlag(seg_timer_id) == FLAG_ON){
+		seg_state = !seg_state;
+		WriteEnState7SEG(seg_state);
+		switch(seg_state){
+		case SEG_EN0:
+			Display7SEG(1);
+			break;
+
+		case SEG_EN1:
+			Display7SEG(2);
+			break;
+
+		default:
+			FillEnState7SEG();
+			break;
+		}
+		SoftwareTimer_ResetFlag(seg_timer_id);
 	}
   }
   /* USER CODE END 3 */
@@ -284,10 +307,8 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-int counter = 100;
-//10ms
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
-
+	SoftwareTimer_Step();
 }
 /* USER CODE END 4 */
 
