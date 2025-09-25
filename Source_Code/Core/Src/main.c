@@ -53,6 +53,10 @@ static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
 void Display7SEG(int number);
 void Clear7SEG();
+
+void WriteEnState7SEG(int number);
+void ClearEnState7SEG();
+void FillEnState7SEG();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -79,6 +83,23 @@ void Clear7SEG(){
 	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, SET);
 }
 
+void WriteEnState7SEG(int number){
+	ClearEnState7SEG();
+	if(number >= 0){
+		HAL_GPIO_WritePin(GPIOA, EN0_Pin << number, RESET);
+	}
+}
+
+void ClearEnState7SEG(){
+	//This will be updated as more 7-segment display is included
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 0, SET);
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 1, SET);
+}
+
+void FillEnState7SEG(){
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 0, RESET);
+	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 1, RESET);
+}
 /* USER CODE END 0 */
 
 /**
@@ -112,6 +133,9 @@ int main(void)
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
   HAL_TIM_Base_Start_IT(&htim2);
+
+  Display7SEG(1);
+  WriteEnState7SEG(0);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -271,6 +295,7 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
 		default:
 			break;
 		}
+		WriteEnState7SEG(seg_state);
 	}
 }
 /* USER CODE END 4 */
