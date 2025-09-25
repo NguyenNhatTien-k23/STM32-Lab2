@@ -32,6 +32,11 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define SEG_ALL_ON -1
+#define SEG_ALL_OFF -2
+
+#define SEG_EN0 0
+#define SEG_EN1 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -43,6 +48,11 @@
 TIM_HandleTypeDef htim2;
 
 /* USER CODE BEGIN PV */
+const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a->g
+const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
+
+//int segment_state = SEG_ALL_ON;
+int seg_number = 0;
 
 /* USER CODE END PV */
 
@@ -51,12 +61,33 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_TIM2_Init(void);
 /* USER CODE BEGIN PFP */
-
+void Display7SEG(int number);
+void Clear7SEG();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+void Display7SEG(int number){
+	Clear7SEG();
 
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 0, !(segment_code[0] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 1, !(segment_code[1] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 2, !(segment_code[2] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 3, !(segment_code[3] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 4, !(segment_code[4] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 5, !(segment_code[5] & number_code[number]));
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, !(segment_code[6] & number_code[number]));
+}
+
+void Clear7SEG(){
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 0, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 1, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 2, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 3, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 4, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 5, SET);
+	HAL_GPIO_WritePin(GPIOB, SEG0_Pin << 6, SET);
+}
 /* USER CODE END 0 */
 
 /**
@@ -89,7 +120,10 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-  HAL_TIM_Base_Start_IT(&htim2);
+//  HAL_TIM_Base_Start_IT(&htim2);
+
+  HAL_GPIO_WritePin(GPIOA, EN0_Pin, RESET);
+  HAL_GPIO_WritePin(GPIOA, EN1_Pin, RESET);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -99,6 +133,11 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  Display7SEG(seg_number++);
+	  if(seg_number >= 10){
+		  seg_number = 0;
+	  }
+	  HAL_Delay(1000);
   }
   /* USER CODE END 3 */
 }
@@ -194,16 +233,30 @@ static void MX_GPIO_Init(void)
 
   /* GPIO Ports Clock Enable */
   __HAL_RCC_GPIOA_CLK_ENABLE();
+  __HAL_RCC_GPIOB_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(LED_GPIO_Port, LED_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(GPIOA, LED_Pin|EN0_Pin|EN1_Pin, GPIO_PIN_RESET);
 
-  /*Configure GPIO pin : LED_Pin */
-  GPIO_InitStruct.Pin = LED_Pin;
+  /*Configure GPIO pin Output Level */
+  HAL_GPIO_WritePin(GPIOB, SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
+                          |SEG4_Pin|SEG5_Pin|SEG6_Pin, GPIO_PIN_RESET);
+
+  /*Configure GPIO pins : LED_Pin EN0_Pin EN1_Pin */
+  GPIO_InitStruct.Pin = LED_Pin|EN0_Pin|EN1_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(LED_GPIO_Port, &GPIO_InitStruct);
+  HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
+
+  /*Configure GPIO pins : SEG0_Pin SEG1_Pin SEG2_Pin SEG3_Pin
+                           SEG4_Pin SEG5_Pin SEG6_Pin */
+  GPIO_InitStruct.Pin = SEG0_Pin|SEG1_Pin|SEG2_Pin|SEG3_Pin
+                          |SEG4_Pin|SEG5_Pin|SEG6_Pin;
+  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
+  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
 }
 
@@ -215,6 +268,8 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
 		counter = 100;
 		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
 	}
+
+
 }
 /* USER CODE END 4 */
 
