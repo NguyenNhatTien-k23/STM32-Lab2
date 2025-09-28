@@ -45,6 +45,7 @@ TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN PV */
 const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a->g
 const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
+const int led_buffer[4] = {7, 5, 5, 4};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,9 +56,11 @@ static void MX_TIM2_Init(void);
 void Display7SEG(int number);
 void Clear7SEG();
 
-void WriteEnState7SEG(int number);
 void ClearEnState7SEG();
+void WriteEnState7SEG(int number);
 void FillEnState7SEG();
+
+void update7SEG(int index);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -105,6 +108,30 @@ void FillEnState7SEG(){
 	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 2, RESET);
 	HAL_GPIO_WritePin(GPIOA, EN0_Pin << 3, RESET);
 }
+
+void update7SEG(int index){
+	WriteEnState7SEG(index);
+	switch(index){
+	case 0:
+		Display7SEG(led_buffer[0]);
+		break;
+
+	case 1:
+		Display7SEG(led_buffer[1]);
+		break;
+
+	case 2:
+		Display7SEG(led_buffer[2]);
+		break;
+
+	case 3:
+		Display7SEG(led_buffer[3]);
+		break;
+
+	default:
+		break;
+	}
+}
 /* USER CODE END 0 */
 
 /**
@@ -140,7 +167,7 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
 
   //Segment start with EN0
-  Display7SEG(1);
+  Display7SEG(led_buffer[0]);
   WriteEnState7SEG(0);
   /* USER CODE END 2 */
 
@@ -278,8 +305,8 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 int led_counter = 100;
-int seg_counter = 0;
-int seg_state = 0;
+int seg_counter = 50;
+int seg_state = 1;		//Init already called seg_state = 0;
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
 	--led_counter;
 	if(led_counter <= 0){
@@ -291,31 +318,11 @@ void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
 	--seg_counter;
 	if(seg_counter <= 0){
 		seg_counter = 50;
+		update7SEG(seg_state++);
 		if(seg_state >= 4){
 			seg_state = 0;
 		}
-		WriteEnState7SEG(seg_state);
-		switch(seg_state){
-		case 0:
-			Display7SEG(1);
-			break;
 
-		case 1:
-			Display7SEG(2);
-			break;
-
-		case 2:
-			Display7SEG(3);
-			break;
-
-		case 3:
-			Display7SEG(0);
-			break;
-
-		default:
-			break;
-		}
-		seg_state++;
 	}
 }
 /* USER CODE END 4 */
