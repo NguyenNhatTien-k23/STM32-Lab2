@@ -57,6 +57,8 @@ int seg_state = 1;		//Init already called seg_state = 0;
 int timer0_counter = 0;
 int timer0_flag = 0;
 
+int timer1_counter = 0;
+int timer1_flag = 0;
 
 /* USER CODE END PV */
 
@@ -77,6 +79,9 @@ void updateClockBuffer();
 
 void setTimer0(int duration);
 void runTimer0();
+
+void setTimer1(int duration);
+void runTimer1();
 
 /* USER CODE END PFP */
 
@@ -171,6 +176,20 @@ void runTimer0(){
 	}
 }
 
+void setTimer1(int duration){
+	timer1_counter = duration / TIME_CYCLE;
+	timer1_flag = 0;
+}
+
+void runTimer1(){
+	if(timer1_counter > 0){
+		--timer1_counter;
+		if(timer1_counter <= 0){
+			timer1_flag = 1;
+		}
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -206,9 +225,10 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
 
   //Segment start with EN0
-//  Display7SEG(led_buffer[0]);
-//  WriteEnState7SEG(0);
-  setTimer0(10);
+  Display7SEG(led_buffer[0]);
+  WriteEnState7SEG(0);
+  setTimer0(1000);
+  setTimer1(1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -218,24 +238,30 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-//	  second++;
-//	  if(second >= 60){
-//		  minute++;
-//		  second = 0;
-//	  }
-//
-//	  if(minute >= 60){
-//		  hour++;
-//		  minute = 0;
-//	  }
-//
-//	  if(hour >= 24){
-//		  hour = 0;
-//	  }
-//	  updateClockBuffer();
+	  //Need a second 1s timer because we need to update sec, min, hr before update Clock Buffer
+	  if(timer1_flag == 1){
+		  second++;
+		  setTimer1(1000);
+	  }
+
+	  if(second >= 60){
+		  minute++;
+		  second = 0;
+	  }
+
+	  if(minute >= 60){
+		  hour++;
+		  minute = 0;
+	  }
+
+	  if(hour >= 24){
+		  hour = 0;
+	  }
 
 	  if(timer0_flag == 1){
 		  HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
+		  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
+		  updateClockBuffer();
 		  setTimer0(1000);
 	  }
   }
@@ -365,24 +391,18 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
-//	--led_counter;
-//	if(led_counter <= 0){
-//		led_counter = 100;
-//		HAL_GPIO_TogglePin(LED_GPIO_Port, LED_Pin);
-//		HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
-//	}
-//
-//	--seg_counter;
-//	if(seg_counter <= 0){
-//		seg_counter = 25;
-//		update7SEG(seg_state++);
-//		if(seg_state >= 4){
-//			seg_state = 0;
-//		}
-//
-//	}
+	--seg_counter;
+	if(seg_counter <= 0){
+		seg_counter = 25;
+		update7SEG(seg_state++);
+		if(seg_state >= 4){
+			seg_state = 0;
+		}
+
+	}
 
 	runTimer0();
+	runTimer1();
 }
 /* USER CODE END 4 */
 
