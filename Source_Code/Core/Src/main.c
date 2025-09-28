@@ -208,7 +208,7 @@ int main(void)
   //Segment start with EN0
 //  Display7SEG(led_buffer[0]);
 //  WriteEnState7SEG(0);
-  setTimer0(1000);
+  setTimer0(10);
   /* USER CODE END 2 */
 
   /* Infinite loop */
