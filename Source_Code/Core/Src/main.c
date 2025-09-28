@@ -60,6 +60,8 @@ int timer0_flag = 0;
 int timer1_counter = 0;
 int timer1_flag = 0;
 
+int timer2_counter = 0;
+int timer2_flag = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -82,6 +84,9 @@ void runTimer0();
 
 void setTimer1(int duration);
 void runTimer1();
+
+void setTimer2(int duration);
+void runTimer2();
 
 /* USER CODE END PFP */
 
@@ -190,6 +195,20 @@ void runTimer1(){
 	}
 }
 
+void setTimer2(int duration){
+	timer2_counter = duration / TIME_CYCLE;
+	timer2_flag = 0;
+}
+
+void runTimer2(){
+	if(timer2_counter > 0){
+		--timer2_counter;
+		if(timer2_counter <= 0){
+			timer2_flag = 1;
+		}
+	}
+}
+
 /* USER CODE END 0 */
 
 /**
@@ -225,10 +244,14 @@ int main(void)
   HAL_TIM_Base_Start_IT(&htim2);
 
   //Segment start with EN0
+
+  //Initial 7SEG-Display
   Display7SEG(led_buffer[0]);
   WriteEnState7SEG(0);
+
   setTimer0(1000);
   setTimer1(1000);
+  setTimer2(250);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -264,6 +287,15 @@ int main(void)
 		  updateClockBuffer();
 		  setTimer0(1000);
 	  }
+
+		if(timer2_flag == 1){
+			setTimer2(250);
+			update7SEG(seg_state++);
+			if(seg_state >= 4){
+				seg_state = 0;
+			}
+
+		}
   }
   /* USER CODE END 3 */
 }
@@ -391,18 +423,9 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void HAL_TIM_PeriodElapsedCallback ( TIM_HandleTypeDef * htim ){
-	--seg_counter;
-	if(seg_counter <= 0){
-		seg_counter = 25;
-		update7SEG(seg_state++);
-		if(seg_state >= 4){
-			seg_state = 0;
-		}
-
-	}
-
 	runTimer0();
 	runTimer1();
+	runTimer2();
 }
 /* USER CODE END 4 */
 
