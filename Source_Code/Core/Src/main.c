@@ -57,6 +57,7 @@ int seg_state = SEG_EN0;
 int seg_timer_id = -1;
 int led_timer_id = -1;
 int row_display_timer_id = -1;
+int matrix_cal_timer_id = -1;
 
 int hour = 15;
 int minute = 8;
@@ -184,14 +185,14 @@ void UpdateClockBuffer(){
 }
 
 void ClearMatrixDisplay(){
-	HAL_GPIO_WritePin(ENM0_GPIO_Port, ENM0_Pin, SET);
-	HAL_GPIO_WritePin(ENM1_GPIO_Port, ENM1_Pin, SET);
-	HAL_GPIO_WritePin(ENM2_GPIO_Port, ENM2_Pin, SET);
-	HAL_GPIO_WritePin(ENM3_GPIO_Port, ENM3_Pin, SET);
-	HAL_GPIO_WritePin(ENM4_GPIO_Port, ENM4_Pin, SET);
-	HAL_GPIO_WritePin(ENM5_GPIO_Port, ENM5_Pin, SET);
-	HAL_GPIO_WritePin(ENM6_GPIO_Port, ENM6_Pin, SET);
-	HAL_GPIO_WritePin(ENM7_GPIO_Port, ENM7_Pin, SET);
+//	HAL_GPIO_WritePin(ENM0_GPIO_Port, ENM0_Pin, SET);
+//	HAL_GPIO_WritePin(ENM1_GPIO_Port, ENM1_Pin, SET);
+//	HAL_GPIO_WritePin(ENM2_GPIO_Port, ENM2_Pin, SET);
+//	HAL_GPIO_WritePin(ENM3_GPIO_Port, ENM3_Pin, SET);
+//	HAL_GPIO_WritePin(ENM4_GPIO_Port, ENM4_Pin, SET);
+//	HAL_GPIO_WritePin(ENM5_GPIO_Port, ENM5_Pin, SET);
+//	HAL_GPIO_WritePin(ENM6_GPIO_Port, ENM6_Pin, SET);
+//	HAL_GPIO_WritePin(ENM7_GPIO_Port, ENM7_Pin, SET);
 
 	HAL_GPIO_WritePin(ROW0_GPIO_Port, ROW0_Pin, SET);
 	HAL_GPIO_WritePin(ROW1_GPIO_Port, ROW1_Pin, SET);
@@ -257,7 +258,8 @@ int main(void)
 
   led_timer_id = SoftwareTimer_AddNewTimer(100);
   seg_timer_id = SoftwareTimer_AddNewTimer(25);
-  row_display_timer_id = SoftwareTimer_AddNewTimer(50);
+  row_display_timer_id = SoftwareTimer_AddNewTimer(5);
+  matrix_cal_timer_id = SoftwareTimer_AddNewTimer(25);
 
   WriteEnState7SEG(seg_state);
   Display7SEG(clock_buffer[0]);
@@ -294,12 +296,19 @@ int main(void)
 	}
 
 	if(SoftwareTimer_GetFlag(row_display_timer_id)){
-		DisplayLedMatrix(row_index++);
+		DisplayLedMatrix(row_index);
+		row_index++;
 		if(row_index >= 8){
 			row_index = 0;
 		}
 		SoftwareTimer_ResetFlag(row_display_timer_id);
 	}
+
+	if(SoftwareTimer_GetFlag(matrix_cal_timer_id)){
+
+		SoftwareTimer_ResetFlag(matrix_cal_timer_id);
+	}
+
   }
   /* USER CODE END 3 */
 }
