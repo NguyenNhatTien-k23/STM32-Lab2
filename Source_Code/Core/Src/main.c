@@ -57,7 +57,6 @@ int seg_state = SEG_EN0;
 int seg_timer_id = -1;
 int led_timer_id = -1;
 int row_display_timer_id = -1;
-int matrix_cal_timer_id = -1;
 
 int hour = 15;
 int minute = 8;
@@ -259,7 +258,6 @@ int main(void)
   led_timer_id = SoftwareTimer_AddNewTimer(100);
   seg_timer_id = SoftwareTimer_AddNewTimer(25);
   row_display_timer_id = SoftwareTimer_AddNewTimer(5);
-  matrix_cal_timer_id = SoftwareTimer_AddNewTimer(25);
 
   WriteEnState7SEG(seg_state);
   Display7SEG(clock_buffer[0]);
@@ -296,17 +294,11 @@ int main(void)
 	}
 
 	if(SoftwareTimer_GetFlag(row_display_timer_id)){
-		DisplayLedMatrix(row_index);
-		row_index++;
+		DisplayLedMatrix(row_index++);
 		if(row_index >= 8){
 			row_index = 0;
 		}
 		SoftwareTimer_ResetFlag(row_display_timer_id);
-	}
-
-	if(SoftwareTimer_GetFlag(matrix_cal_timer_id)){
-
-		SoftwareTimer_ResetFlag(matrix_cal_timer_id);
 	}
 
   }
