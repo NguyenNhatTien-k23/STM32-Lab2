@@ -23,6 +23,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "Software_Timer.h"
+#include "Matrix_Display.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -54,17 +55,17 @@ const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a-
 const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
 
 int seg_state = SEG_EN0;
+
 int seg_timer_id = -1;
 int led_timer_id = -1;
-int row_display_timer_id = -1;
+int matrix_display_timer_id = -1;
+int matrix_update_timer_id = -1;
 
 int hour = 15;
 int minute = 8;
 int second = 50;
 int clock_buffer[4] = {1, 5, 0, 8};
-uint8_t matrix_buffer[8] = {0x3C ,0x7E ,0x66 ,0x66 ,0x7E ,0x7E ,0x66, 0x66};
 
-int row_index = 0;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -83,10 +84,6 @@ void DisplayClock();
 void UpdateClock();
 void UpdateClockBuffer();
 
-void ClearMatrixDisplay();
-void DisplayLedMatrix(int buffer_index);
-void DisplayCollumn(uint8_t bit_map);
-void UpdateLedMatrix();
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -183,42 +180,6 @@ void UpdateClockBuffer(){
 	clock_buffer[3] = minute - clock_buffer[2] * 10;
 }
 
-void ClearMatrixDisplay(){
-//	HAL_GPIO_WritePin(ENM0_GPIO_Port, ENM0_Pin, SET);
-//	HAL_GPIO_WritePin(ENM1_GPIO_Port, ENM1_Pin, SET);
-//	HAL_GPIO_WritePin(ENM2_GPIO_Port, ENM2_Pin, SET);
-//	HAL_GPIO_WritePin(ENM3_GPIO_Port, ENM3_Pin, SET);
-//	HAL_GPIO_WritePin(ENM4_GPIO_Port, ENM4_Pin, SET);
-//	HAL_GPIO_WritePin(ENM5_GPIO_Port, ENM5_Pin, SET);
-//	HAL_GPIO_WritePin(ENM6_GPIO_Port, ENM6_Pin, SET);
-//	HAL_GPIO_WritePin(ENM7_GPIO_Port, ENM7_Pin, SET);
-
-	HAL_GPIO_WritePin(ROW0_GPIO_Port, ROW0_Pin, SET);
-	HAL_GPIO_WritePin(ROW1_GPIO_Port, ROW1_Pin, SET);
-	HAL_GPIO_WritePin(ROW2_GPIO_Port, ROW2_Pin, SET);
-	HAL_GPIO_WritePin(ROW3_GPIO_Port, ROW3_Pin, SET);
-	HAL_GPIO_WritePin(ROW4_GPIO_Port, ROW4_Pin, SET);
-	HAL_GPIO_WritePin(ROW5_GPIO_Port, ROW5_Pin, SET);
-	HAL_GPIO_WritePin(ROW6_GPIO_Port, ROW6_Pin, SET);
-	HAL_GPIO_WritePin(ROW7_GPIO_Port, ROW7_Pin, SET);
-}
-
-void DisplayCollumn(uint8_t bit_map){ //7<-0
-	HAL_GPIO_WritePin(ENM0_GPIO_Port, ENM0_Pin, !(bit_map & 0x01));
-	HAL_GPIO_WritePin(ENM1_GPIO_Port, ENM1_Pin, !(bit_map & 0x02));
-	HAL_GPIO_WritePin(ENM2_GPIO_Port, ENM2_Pin, !(bit_map & 0x04));
-	HAL_GPIO_WritePin(ENM3_GPIO_Port, ENM3_Pin, !(bit_map & 0x08));
-	HAL_GPIO_WritePin(ENM4_GPIO_Port, ENM4_Pin, !(bit_map & 0x10));
-	HAL_GPIO_WritePin(ENM5_GPIO_Port, ENM5_Pin, !(bit_map & 0x20));
-	HAL_GPIO_WritePin(ENM6_GPIO_Port, ENM6_Pin, !(bit_map & 0x40));
-	HAL_GPIO_WritePin(ENM7_GPIO_Port, ENM7_Pin, !(bit_map & 0x80));
-}
-
-void DisplayLedMatrix(int buffer_index){
-	ClearMatrixDisplay();
-	DisplayCollumn(matrix_buffer[buffer_index]);
-	HAL_GPIO_WritePin(GPIOB, ROW0_Pin << buffer_index, RESET);
-}
 /* USER CODE END 0 */
 
 /**
@@ -257,7 +218,8 @@ int main(void)
 
   led_timer_id = SoftwareTimer_AddNewTimer(100);
   seg_timer_id = SoftwareTimer_AddNewTimer(25);
-  row_display_timer_id = SoftwareTimer_AddNewTimer(5);
+  matrix_display_timer_id = SoftwareTimer_AddNewTimer(5);
+  matrix_update_timer_id = SoftwareTimer_AddNewTimer(80);
 
   WriteEnState7SEG(seg_state);
   Display7SEG(clock_buffer[0]);
@@ -293,14 +255,18 @@ int main(void)
 		SoftwareTimer_ResetFlag(seg_timer_id);
 	}
 
-	if(SoftwareTimer_GetFlag(row_display_timer_id)){
+	if(SoftwareTimer_GetFlag(matrix_display_timer_id)){
 		DisplayLedMatrix(row_index++);
 		if(row_index >= 8){
 			row_index = 0;
 		}
-		SoftwareTimer_ResetFlag(row_display_timer_id);
+		SoftwareTimer_ResetFlag(matrix_display_timer_id);
 	}
 
+	if(SoftwareTimer_GetFlag(matrix_update_timer_id)){
+		UpdateLedMatrix();
+		SoftwareTimer_ResetFlag(matrix_update_timer_id);
+	}
   }
   /* USER CODE END 3 */
 }

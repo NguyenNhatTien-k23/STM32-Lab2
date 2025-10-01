@@ -1,0 +1,6 @@
+Matrix_Display.c:19:6:ClearMatrixDisplay	8	static
+Matrix_Display.c:30:6:DisplayCollumn	16	static
+Matrix_Display.c:41:6:DisplayLedMatrix	16	static
+Matrix_Display.c:47:6:UpdateLedMatrix	8	static
+Matrix_Display.c:124:6:MatrixBufferShiftLeft	4	static
+Matrix_Display.c:142:6:InsertBit	40	static
