@@ -353,7 +353,7 @@ void update7SEG(int index){
 	switch(index){
 	case 0:
 		Display7SEG(led_buffer[0]);
- 8000344:	2307      	movs	r3, #7
+ 8000344:	2301      	movs	r3, #1
  8000346:	4618      	mov	r0, r3
  8000348:	f7ff ff00 	bl	800014c <Display7SEG>
 		break;
@@ -361,7 +361,7 @@ void update7SEG(int index){
 
 	case 1:
 		Display7SEG(led_buffer[1]);
- 800034e:	2305      	movs	r3, #5
+ 800034e:	2302      	movs	r3, #2
  8000350:	4618      	mov	r0, r3
  8000352:	f7ff fefb 	bl	800014c <Display7SEG>
 		break;
@@ -369,7 +369,7 @@ void update7SEG(int index){
 
 	case 2:
 		Display7SEG(led_buffer[2]);
- 8000358:	2305      	movs	r3, #5
+ 8000358:	2303      	movs	r3, #3
  800035a:	4618      	mov	r0, r3
  800035c:	f7ff fef6 	bl	800014c <Display7SEG>
 		break;
@@ -377,7 +377,7 @@ void update7SEG(int index){
 
 	case 3:
 		Display7SEG(led_buffer[3]);
- 8000362:	2304      	movs	r3, #4
+ 8000362:	2300      	movs	r3, #0
  8000364:	4618      	mov	r0, r3
  8000366:	f7ff fef1 	bl	800014c <Display7SEG>
 		break;
@@ -433,7 +433,7 @@ int main(void)
 
   //Segment start with EN0
   Display7SEG(led_buffer[0]);
- 8000392:	2307      	movs	r3, #7
+ 8000392:	2301      	movs	r3, #1
  8000394:	4618      	mov	r0, r3
  8000396:	f7ff fed9 	bl	800014c <Display7SEG>
   WriteEnState7SEG(0);

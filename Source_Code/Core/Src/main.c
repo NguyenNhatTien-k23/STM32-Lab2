@@ -45,7 +45,7 @@ TIM_HandleTypeDef htim2;
 /* USER CODE BEGIN PV */
 const uint8_t segment_code[7] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40}; //a->g
 const uint8_t number_code[10] = {0x3F, 0x06, 0x5B, 0x4F, 0x66, 0x6D, 0x7D, 0x07, 0x7F, 0x6F};	//0->9 a->g
-const int led_buffer[4] = {7, 5, 5, 4};
+const int led_buffer[4] = {1, 2, 3, 0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
