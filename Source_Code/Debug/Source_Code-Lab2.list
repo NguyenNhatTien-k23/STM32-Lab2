@@ -1628,8 +1628,8 @@ int main(void)
  8000bf8:	4603      	mov	r3, r0
  8000bfa:	4a3d      	ldr	r2, [pc, #244]	; (8000cf0 <main+0x134>)
  8000bfc:	6013      	str	r3, [r2, #0]
-  matrix_update_timer_id = SoftwareTimer_AddNewTimer(80);
- 8000bfe:	2050      	movs	r0, #80	; 0x50
+  matrix_update_timer_id = SoftwareTimer_AddNewTimer(40);
+ 8000bfe:	2028      	movs	r0, #40	; 0x28
  8000c00:	f7ff fda6 	bl	8000750 <SoftwareTimer_AddNewTimer>
  8000c04:	4603      	mov	r3, r0
  8000c06:	4a3b      	ldr	r2, [pc, #236]	; (8000cf4 <main+0x138>)

@@ -219,7 +219,7 @@ int main(void)
   led_timer_id = SoftwareTimer_AddNewTimer(100);
   seg_timer_id = SoftwareTimer_AddNewTimer(25);
   matrix_display_timer_id = SoftwareTimer_AddNewTimer(5);
-  matrix_update_timer_id = SoftwareTimer_AddNewTimer(80);
+  matrix_update_timer_id = SoftwareTimer_AddNewTimer(40);
 
   WriteEnState7SEG(seg_state);
   Display7SEG(clock_buffer[0]);
