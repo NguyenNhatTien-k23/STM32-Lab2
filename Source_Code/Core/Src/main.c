@@ -238,11 +238,6 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  //Need a second 1s timer because we need to update sec, min, hr before update Clock Buffer
-	  if(timer1_flag == 1){
-		  second++;
-		  setTimer1(1000);
-	  }
 
 	  if(second >= 60){
 		  minute++;
@@ -263,6 +258,7 @@ int main(void)
 		  HAL_GPIO_TogglePin(DOT_GPIO_Port, DOT_Pin);
 		  updateClockBuffer();
 		  setTimer0(1000);
+		  second++;
 	  }
   }
   /* USER CODE END 3 */
